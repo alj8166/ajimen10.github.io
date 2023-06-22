@@ -998,17 +998,41 @@
                 var publisher = book.volumeInfo.publisher;
                 var publishedDate = book.volumeInfo.publishedDate;
                 var pageCount = book.volumeInfo.pageCount;
+                var industryIdentifiers = book.volumeInfo.industryIdentifiers;
+                var printType = book.volumeInfo.printType;
+                var categories = book.volumeInfo.categories.join(", ");
+                var averageRating = book.volumeInfo.averageRating;
+                var ratingsCount = book.volumeInfo.ratingsCount;
+                var maturityRating = book.volumeInfo.maturityRating;
+                var contentVersion = book.volumeInfo.contentVersion;
+                var language = book.volumeInfo.language;
+                var previewLink = book.volumeInfo.previewLink;
+                var infoLink = book.volumeInfo.infoLink;
+                var canonicalVolumeLink = book.volumeInfo.canonicalVolumeLink;
                 
-                //creating list to display each book in html
-                var listItem = $("<li>").html("<img src='" + thumbnail + "' alt='Thumbnail'>" + "<br>" +
-                                              "<b>Title:</b> " + title + "<br>" +
-                                              "<b>Subtitle:</b> " + subtitle + "<br>" +
-                                              "<b>Authors:</b> " + authors + "<br>" +
-                                              "<b>Description:</b> " + description + "<br>" +
-                                              "<b>Publisher:</b> " + publisher + ", " + publishedDate + "<br>" +
-                                              "<b>Pages:</b> " + pageCount + "<br> <br>");
+                //creating list to display each book item in html
+                var listItem = $("<li>").css("list-style", "none").html(
+                  "<img src='" + thumbnail + "' alt='Thumbnail'>" + "<br>" + 
+                  "<b>Title:</b> " + title + "<br>" +
+                  "<b>Subtitle:</b> " + subtitle + "<br>" +
+                  "<b>Authors:</b> " + authors + "<br>" +                            
+                  "<b>Description:</b> " + description + "<br>" +                            
+                  "<b>Publisher:</b> " + publisher + ", " + publishedDate + "<br>" +                            
+                  "<b>Pages:</b> " + pageCount + "<br>" +
+                  "<b>Industry Identifiers:</b> " + JSON.stringify(industryIdentifiers) + "<br>" +
+                  "<b>Print Type:</b> " + printType + "<br>" +
+                  "<b>Categories:</b> " + categories + "<br>" +
+                  "<b>Average Rating:</b> " + averageRating + "<br>" +
+                  "<b>Ratings Count:</b> " + ratingsCount + "<br>" +
+                  "<b>Maturity Rating:</b> " + maturityRating + "<br>" +
+                  "<b>Version:</b> " + contentVersion + "<br>" + 
+                  "<b>Language:</b> " + language + "<br>" +
+                  "<a href='" + previewLink + "'>Preview</a><br>" +
+                  "<a href='" + infoLink + "'>More Information</a><br>" +
+                  "<a href='" + canonicalVolumeLink + "'>Canonical URL</a><br><br><br>"                            
+                );                            
                                               
-
+                //appending the list
                 bookList.append(listItem);
               });
             });       
