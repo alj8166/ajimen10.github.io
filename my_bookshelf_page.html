@@ -5,13 +5,13 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>My Bookshelf</title>
     <style>
-        /* Add a black background color to the top navigation */
+        /*Add a black background color to the top navigation */
         .topnav {
         background-color: black;
         overflow: hidden;
         }
 
-        /* Style the links inside the navigation bar */
+        /*Style the links inside the navigation bar*/
         .topnav a {
         float: left;
         color: #f2f2f2;
@@ -21,19 +21,19 @@
         font-size: 17px;
         }
 
-        /* Change the color of links on hover */
+        /*Change the color of links on hover*/
         .topnav a:hover {
         background-color: #ddd;
         color: black;
         }
 
-        /* Add a color to the active/current link */
+        /*Add a color to the active/current link*/
         .topnav a.active {
         background-color:blue;
         color: white;
         }
 
-        /* style the footer */
+        /*style the footer*/
         footer {
           background-color: black;
           color: white;
@@ -41,44 +41,51 @@
           text-align: center;
         }
 
+        /*style the list for displaying books*/
         .book-list {
             display: flex;
             flex-wrap: wrap;
             justify-content: center;
         }
-        .book-item {
+        
+        /*style the background and container for each book*/
+        .book-container {
             border: 1px solid #ddd;
             background-color: rgb(155, 155, 155);
             margin: 10px;
             padding: 10px;
             width: 200px;
         }
-        .book-cover {
+
+        /*style the book images*/
+        .book-image {
             height: auto;
             width: 100%;
         }
 
     </style>
-     <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.5.1/jquery.min.js"></script>
+     <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.5.1/jquery.min.js"></script><!--Adding jQuery library for ajax-->
 </head>
 
 
 <body>
     <!--displays the top nav bar-->  
     <div class="topnav">
-        <a class="active" href="index.html">Milestone 1</a>
-        <a href="milestone2.html">Milestone 2</a>
+        <a href="index.html">Milestone 1</a>
+        <a class="active" href="milestone2.html">Milestone 2</a>
         <a href="milestone3.html">Milestone 3</a>
         <a href="milestone4.html">Milestone 4</a>
     </div>
 
-    <h1 style="text-align: center;">My Bookshelf</h1>
+    <h1 style="text-align: center;">Milestone 2: My Bookshelf</h1>
     <div id="book-list" class="book-list"></div>
     <script>
+        //Setting Variables
         var userId = '112292931761277579605';
-        var shelfId = '0'; 
-        var url = 'https://www.googleapis.com/books/v1/users/' + userId + '/bookshelves/' + shelfId + '/volumes';
+        var bookshelfID = '0'; 
+        var url = 'https://www.googleapis.com/books/v1/users/' + userId + '/bookshelves/' + bookshelfID + '/volumes';
 
+        //Using ajax method to pull info from Google Books API
         $.ajax({
             url: url,
             dataType: "jsonp",
@@ -90,14 +97,15 @@
                 books.forEach(function(book) {
                     // Creating a div tag for each book
                     var div = document.createElement('div');
-                    div.className = 'book-item';
+                    div.className = 'book-container';
                     
-                    // Get the book cover image. If not available, set to a default image
-                    var bookCover = book.volumeInfo.imageLinks ? book.volumeInfo.imageLinks.smallThumbnail : 'https://via.placeholder.com/128x193?text=No%20Cover';
+                    //Getting the book thumbnail image
+                    var bookImage = book.volumeInfo.imageLinks ? book.volumeInfo.imageLinks.smallThumbnail : 'https://via.placeholder.com/128x193?text=No%20Cover';
                     
+                    //Adding HTML to the script to display the books
                     div.innerHTML = `
                         <a href="${book.volumeInfo.infoLink}" target="_blank">
-                            <img class="book-cover" src="${bookCover}" alt="Book Cover">
+                            <img class="book-image" src="${bookImage}" alt="Book Cover">
                             <h2 style="text-align: center;">${book.volumeInfo.title}</h2>
                         </a>
                     `;
