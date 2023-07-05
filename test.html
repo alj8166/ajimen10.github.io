@@ -1,0 +1,61 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Public Bookshelf</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+        }
+        .book-list {
+            display: flex;
+            flex-wrap: wrap;
+            justify-content: center;
+        }
+        .book-item {
+            border: 1px solid #ddd;
+            margin: 10px;
+            padding: 10px;
+            width: 200px;
+        }
+        .book-cover {
+            height: auto;
+            width: 100%;
+        }
+    </style>
+    <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.5.1/jquery.min.js"></script>
+</head>
+<body>
+    <h1 style="text-align: center;">My Favorites</h1>
+    <div id="book-list" class="book-list"></div>
+    <script>
+        var userId = '112292931761277579605';
+        var shelfId = '0'; 
+        var url = 'https://www.googleapis.com/books/v1/users/' + userId + '/bookshelves/' + shelfId + '/volumes';
+
+        $.ajax({
+            url: url,
+            dataType: "jsonp",
+            success: function(data) {
+                var bookList = document.getElementById('book-list');
+                var books = data.items;
+                books.forEach(function(book) {
+                    // Create a div element for each book
+                    var div = document.createElement('div');
+                    div.className = 'book-item';
+                    
+                    // Get the book cover image. If not available, set to a default image
+                    var bookCover = book.volumeInfo.imageLinks ? book.volumeInfo.imageLinks.smallThumbnail : 'https://via.placeholder.com/128x193?text=No%20Cover';
+                    
+                    div.innerHTML = `
+                        <a href="${book.volumeInfo.infoLink}" target="_blank">
+                            <img class="book-cover" src="${bookCover}" alt="Book Cover">
+                            <h2>${book.volumeInfo.title}</h2>
+                        </a>
+                    `;
+                    bookList.appendChild(div);
+                });
+            }
+        });
+    </script>
+</body>
+</html>
