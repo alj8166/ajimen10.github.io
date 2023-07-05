@@ -1,0 +1,176 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Milestone 2</title>
+    <style>
+        /* Add a black background color to the top navigation */
+        .topnav {
+        background-color: black;
+        overflow: hidden;
+        }
+
+        /* Style the links inside the navigation bar */
+        .topnav a {
+        float: left;
+        color: #f2f2f2;
+        text-align: center;
+        padding: 14px 16px;
+        text-decoration: none;
+        font-size: 17px;
+        }
+
+        /* Change the color of links on hover */
+        .topnav a:hover {
+        background-color: #ddd;
+        color: black;
+        }
+
+        /* Add a color to the active/current link */
+        .topnav a.active {
+        background-color:blue;
+        color: white;
+        }
+
+        /* Style to create an invisible box around each book displayed */
+        .book-box {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            margin: 15px auto;
+            padding: 10px;
+            width: 80%;            
+        }
+
+        /* Styling the image for each book */
+        .book-box img {
+            height: 200px;
+            width: auto;
+        }
+        
+        /* Styling the page selection dropdown menu */
+        #page-selection {
+            display: block;
+            margin: 20px auto;
+        }
+
+        /*Creating container for content in center of page*/
+        .container {
+          display: flex;
+          justify-content: center;
+          align-items: center;
+          height: 100%;
+        }
+
+        /*Organizing content within the box*/
+        .box {
+          width: 1000px;
+          height: fit-content;
+          background-color: rgb(213, 254, 255);
+          text-align: left;
+          padding: 20px;
+        }
+
+        /* styling the footer */
+        footer {
+          background-color: black;
+          color: white;
+          padding: 10px;
+          text-align: center;
+        }
+    </style>
+</head>
+
+
+<body>
+    <!--displays the top nav bar in html-->  
+    <div class="topnav">
+        <a href="index.html">Milestone 1</a>
+        <a class="active" href="milestone2.html">Milestone 2</a>
+        <a href="milestone3.html">Milestone 3</a>
+        <a href="milestone4.html">Milestone 4</a>
+    </div>
+
+    <!--using div tags to organize content-->
+    <div class="container"> 
+        <div class="box">
+            <h1 style="text-align: center;">Milestone 2: Book Search Page</h1>
+            
+            <!--creating search form for user to enter book-->
+            <form id="search-form" style="text-align: center;">
+                <input type="text" id="search-box" placeholder="Search for books" />
+                <input type="submit" value="Search" />
+            </form>
+
+            <!--Creating container for displaying the books-->
+            <div id="book-container"></div>
+
+            <!--Page selection dropdown button-->
+            <select id="page-selection"></select>
+
+            <script>
+                //Creating const variables
+                const searchForm = document.getElementById('search-form');
+                const searchButton = document.getElementById('search-box');
+                const bookContainer = document.getElementById('book-container');
+                const pageSelection = document.getElementById('page-selection');
+                const resultsPerPage = 15; //setting max results per page to 15
+        
+                //Script for handling form submission
+                searchForm.onsubmit = function(event) {
+                    event.preventDefault();
+                    searchBooks(searchButton.value);
+                };
+        
+                //Script for handling page selection
+                pageSelection.onchange = function() {
+                    const startIndex = pageSelection.selectedIndex * resultsPerPage;
+                    searchBooks(searchButton.value, startIndex);
+                };
+        
+                //Function to search for books
+                function searchBooks(query, startIndex = 0) {
+                    //Pulling data from Google Books API
+                    fetch(`https://www.googleapis.com/books/v1/volumes?q=${encodeURIComponent(query)}&startIndex=${startIndex}&maxResults=${resultsPerPage}`)
+                        .then(response => response.json())
+                        .then(data => {
+                            //Clears previous books and page options
+                            bookContainer.innerHTML = '';
+                            pageSelection.innerHTML = '';
+                            // Creating page select button options, limited to 4 max pages
+                            const totalPages = Math.min(4, Math.ceil(data.totalItems / resultsPerPage));
+                            for (let i = 0; i < totalPages; i++) {
+                                const option = document.createElement('option');
+                                option.textContent = `Page ${i+1}`;
+                                pageSelection.appendChild(option);
+                            }
+                            
+                            //Selecting the current page
+                            pageSelection.selectedIndex = startIndex / resultsPerPage;
+                            
+                            //Creating and appending book continers for each book in the Google API data
+                            data.items.forEach(item => {
+                                const box = document.createElement('div');
+                                box.classList.add('book-box');
+                                const link = document.createElement('a');
+                                link.href = item.volumeInfo.previewLink;
+                                link.textContent = item.volumeInfo.title;
+                                const image = document.createElement('img');
+                                image.src = item.volumeInfo.imageLinks.thumbnail;
+                                box.appendChild(link);
+                                box.appendChild(image);
+                                bookContainer.appendChild(box);
+                            });
+                        });
+                }
+            </script>
+        </div>
+    </div>
+    
+    <!--displays footer-->
+    <footer>
+        <p>This is a project for IT 4403 by Alvaro Jimenez-Kosan</p>
+    </footer>
+</body>
+</html>
