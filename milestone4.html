@@ -4,6 +4,8 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Milestone 4</title>
+    <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.5.1/jquery.min.js"></script><!--Importing jQuery library-->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/mustache.js/4.0.1/mustache.min.js"></script><!--Importing Mustache.js library-->
     <style>
         /* Add a black background color to the top navigation */
         .topnav {
@@ -33,7 +35,7 @@
         color: white;
         }
 
-        /* Add style to the footer*/
+        /* Add style to the footer */
         .footer {
         position: fixed;
         left: 0;
@@ -43,31 +45,181 @@
         color: white;
         text-align: center;
         }
+
+        /* Centering text for headers */
+        h1, h2 {
+            text-align: center;
+        }
+
+        /* Styling for search box */
+        #search-box {
+            width: 25%;
+            padding: 10px;
+        }
+
+        /* Styling for search, page, list view, and grid view buttons */
+        #search-button, .pages button, #list-view-button, #grid-view-button {
+            padding: 10px 20px;
+            color: white;
+            border: none;
+            cursor: pointer;
+            background-color: black;
+        }
+
+        /* Changing color of active page*/
+        .pages button:disabled {
+            background-color: #888;
+        }
+
+        /* Styling for book results */
+        .book {
+            padding: 10px;
+            margin: 10px;
+            width: calc(25% - 20px);
+            box-sizing: border-box;
+            text-align: center;
+            cursor: pointer;
+            display: inline-block;
+        }
+
+        /* Styling for book cover images */
+        .book img {
+            width: 125px;
+            height: 175px;
+        }
+
+        /* Styling for page navigation buttons */
+        .pages {
+            text-align: center;
+            clear: both;
+        }
+
+        /* Centering text for bookshelf and search results */
+        #bookshelf, #search-results {
+            text-align: center;
+        }
+
+        /* Styling for book details section */
+        #book-detail {
+            margin: 20px 0;
+            padding: 20px;
+            background-color: #f9f9f9;
+        }
+
+        /* Styling the list view */
+        .list-view {
+            width: 100%;
+            display: block !important;
+        }
+
+        /* Styling the grid view */
+        .grid-view {
+            width: calc(25% - 20px) !important; 
+            display: inline-block !important; 
+        }
     </style>
 </head>
-
-
 <body>
-    <!--displays the top nav bar in html-->  
+    <!--displays the top nav bar-->  
     <div class="topnav">
-        <a  href="index.html">Milestone 1</a>
+        <a href="index.html">Milestone 1</a>
         <a href="milestone2.html">Milestone 2</a>
         <a href="milestone3.html">Milestone 3</a>
         <a class="active" href="milestone4.html">Milestone 4</a>
     </div>
 
-    <h2>
-        Milestone 4
-    </h2>
+    <h1>Milestone 4</h1>
 
+    <!-- Search bar, search button, list view, and grid view buttons -->
+    <div style="text-align: center;">
+        <input type="text" id="search-box">
+        <button id="search-button">Search</button>
+        <button id="list-view-button">List View</button>
+        <button id="grid-view-button">Grid View</button> 
+    </div><br>
 
+    <!-- Containers for displaying search results, book details, page select buttons, and bookshelf -->
+    <div id="search-results"></div>
+    <div id="book-detail"></div>
+    <div class="pages"></div><br>
+    <h2>My Bookshelf</h2>
+    <div id="bookshelf"></div><br>
 
+    <!-- Mustache.js Templates -->
+    <script id="book-template" type="text/template">
+        <div class="book" onclick="displayBookDetails('{{id}}')">
+            <img src="{{volumeInfo.imageLinks.thumbnail}}" alt="{{volumeInfo.title}}">
+            <p>{{volumeInfo.title}}</p>
+        </div>
+    </script>
+    <script id="book-detail-template" type="text/template">
+        <h3>{{volumeInfo.title}}</h3>
+        <img src="{{volumeInfo.imageLinks.thumbnail}}" alt="{{volumeInfo.title}}">
+        <p><strong>Author:</strong> {{volumeInfo.authors.join(', ')}}</p>
+        <p><strong>Publisher:</strong> {{volumeInfo.publisher}}</p>
+        <p><strong>Published Date:</strong> {{volumeInfo.publishedDate}}</p>
+        <p><strong>Page Count:</strong> {{volumeInfo.pageCount}}</p>
+        <p><strong>Maturity Rating:</strong> {{volumeInfo.maturityRating}}</p>
+        <p>{{volumeInfo.description}}</p>
+    </script>
 
+    <script>
+        /* Variable to keep track of the current page number */
+        var currentPage = 1;
 
+        /* Function to pull information from Google Books API */
+        function fetchBooks(url, target) {
+            $.get(url, function(data) {
+                $(target).empty();
+                data.items.forEach(book => {
+                    var bookHtml = `
+                        <div class="book" onclick="displayBookDetails('${book.id}')">
+                            <img src="${book.volumeInfo.imageLinks.thumbnail}" alt="${book.volumeInfo.title}">
+                            <p>${book.volumeInfo.title}</p>
+                        </div>`;
+                    $(target).append(bookHtml);
+                });
+            });
+        }
 
+        /* Function to display book details */
+        function displayBookDetails(bookId) {
+            $.get(`https://www.googleapis.com/books/v1/volumes/${bookId}`, function(data) {
+                var detailHtml = `
+                    <h3>${data.volumeInfo.title}</h3>
+                    <img src="${data.volumeInfo.imageLinks.thumbnail}" alt="${data.volumeInfo.title}">
+                    <p><strong>Author:</strong> ${data.volumeInfo.authors.join(', ')}</p>
+                    <p><strong>Publisher:</strong> ${data.volumeInfo.publisher}</p>
+                    <p><strong>Published Date:</strong> ${data.volumeInfo.publishedDate}</p>
+                    <p><strong>Page Count:</strong> ${data.volumeInfo.pageCount}</p>
+                    <p><strong>Maturity Rating:</strong> ${data.volumeInfo.maturityRating}</p>
+                    <p>${data.volumeInfo.description}</p>`;
+                $('#book-detail').html(detailHtml);
+            });
+        }
 
+        /* jQuery ready function to ensure all HTML is loaded before the script runs */
+        $(document).ready(function() {
+            fetchBooks(`https://www.googleapis.com/books/v1/users/112292931761277579605/bookshelves/0/volumes`, '#bookshelf');
+            $('#search-button').click(function() {
+                var query = $('#search-box').val();
+                fetchBooks(`https://www.googleapis.com/books/v1/volumes?q=${query}&maxResults=10&startIndex=${(currentPage-1)*10}`, '#search-results');
+                $('.pages').empty();
+                for (let i = 1; i <= 5; i++) {
+                    $('.pages').append(`<button${i === currentPage ? ' disabled' : ''} onclick="currentPage = ${i}; $('#search-button').click();">${i}</button>`);
+                }
+            });
+            /* Adding click events to the List View and Grid View buttons */
+            $('#list-view-button').click(function() {
+                $('.book').addClass('list-view').removeClass('grid-view');
+            });
+            $('#grid-view-button').click(function() {
+                $('.book').addClass('grid-view').removeClass('list-view');
+            });
+        });
+    </script>
 
-    <!--Displays the footer-->
+    <!-- footer -->
     <div class="footer">
         <p>This is a project for IT 4403 by Alvaro Jimenez-Kosan</p>
     </div>
